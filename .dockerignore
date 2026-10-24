@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.gitignore
+.vscode/
+.env
+.env.dev
+.env.prod
+.env.test
+tickets/
+uagents_core.log
+scratch/

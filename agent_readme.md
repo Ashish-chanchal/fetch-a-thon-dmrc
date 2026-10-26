@@ -1,23 +1,38 @@
-# Delhi Metro Ticket Booking
+# Delhi Metro Ticket Booking (@metrotickets)
 
-Plan a Delhi Metro journey and book your ticket in one chat. Pay in FET on the Fetch.ai testnet and get a signed QR ticket back.
+Plan your Delhi Metro journeys and book tickets directly within ASI:One chat. Powered by Fetch.ai uAgents, ONDC TRV11 mobility standards, real-time transit telemetry, and on-chain settlement.
 
-## What you can ask
+Deployed 24/7 on **Google Cloud Run** (`metrotickets`) using Docker and Agentverse Mailbox mode.
+
+---
+
+## What You Can Ask
 - "Fare from Hauz Khas to Rajiv Chowk"
 - "Book 2 tickets from Kashmere Gate to Rajiv Chowk"
-- "How many interchanges are there?"
-- "Which line do I take from Noida Sector 18 to Rajiv Chowk?"
+- "How many interchanges between Noida Sector 18 and Rajiv Chowk?"
+- "Check live stations and travel time from Gurugram to Kashmere Gate"
 
-## How it works
-1. You ask for a route. The agent looks up the fare, stations, interchanges and travel time from public DMRC fare data.
-2. Tap **Book Ticket**. The agent asks you to pay the fare in FET using the Agent Payment Protocol.
-3. After you pay, the agent checks your transfer on the Fetch.ai ledger (right sender, right recipient, enough amount). Each payment can buy only one ticket.
-4. You receive a signed QR ticket and a link to your payment on the block explorer.
+---
 
-## Under the hood
-Three cooperating uAgents mirror the ONDC buyer/seller split: a coordinator (chat, payment, ticket delivery), a catalog agent (stations, fares, quotes) and a ticketing agent (orders and QR issuance). The chat is powered by the ASI:One model with tool calling.
+## How It Works
+1. **Interactive Route & Fare Discovery**: Ask for any journey across all 254 active Delhi Metro stations. The agent retrieves real-time station graphs, interchange details, travel times, and exact fares in INR and FET.
+2. **Instant 1-Click Booking**: Tap **`[⚡ Book Ticket]`** on the interactive Journey Card. The agent initializes the order and requests payment in FET.
+3. **On-Chain Blockchain Settlement**: Approve payment in your ASI:One wallet or send FET on the Fetch.ai Dorado testnet. The agent verifies the transaction on-chain (confirming recipient, amount, and anti-replay protection).
+4. **Instant Cryptographic QR Ticket**: Receive a high-resolution, Ed25519-signed digital QR ticket with simulated DMRC RSF 2.0 bank remittance reference and NPCI UPI UTR.
+5. **Turnstile Gate Verification**: Test gate actions directly in the chat with simulated origin turnstile entry and destination exit scans.
 
-## Status
-Hackathon demo on the Fetch.ai testnet (no real money). ONDC messages, the DMRC settlement and the turnstile scans are simulated. Tickets will not open real gates.
+---
 
-Protocols: Agent Chat Protocol, Agent Payment Protocol (seller).
+## Under the Hood
+The service coordinates three autonomous uAgents running in a containerized Fetch.ai Bureau:
+- **`metro_bap_coordinator`**: Interfaces with riders via `AgentChatProtocol` and handles wallet payments via `AgentPaymentProtocol`.
+- **`metro_bpp_catalog_agent`**: Resolves station graphs, live Delhi OTD GTFS-RT vehicle telemetry (`VehiclePositions.pb`), and computes fares.
+- **`metro_bpp_ticketing_agent`**: Generates cryptographic QR tokens, manages order fulfillment, and executes dual-rail settlement.
+
+---
+
+## Environment & Status
+- **Deployment**: Google Cloud Run (`metrotickets`), Python 3.12 Docker Container.
+- **Connection Mode**: Agentverse Mailbox (`ENABLE_MAILBOX=true`) — 24/7 always-on connection.
+- **Blockchain**: Fetch.ai Dorado Testnet (`atestfet`).
+- **Protocols**: Agent Chat Protocol, Agent Payment Protocol (role="seller"), ONDC:TRV11 v2.1.0 (Mobility).
